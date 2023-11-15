@@ -1,2 +1,2 @@
 #!/bin/bash
-python3 seedcli.py "$@"
+python3 seedcli/seedcli.py "$@"

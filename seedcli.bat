@@ -1,2 +1,2 @@
 @echo off
-python.exe seedcli.py %*
+python.exe seedcli\seedcli.py %*
