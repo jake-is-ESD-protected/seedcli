@@ -101,13 +101,13 @@ class CcmdSend(Ccmd):
         except:
             print(f"File <{self.targetFile}> does not exist!")
             return None
-        return f"{self.name} {len(data)}"
+        return f"{self.name} {self.flags[0]} {len(data)}"
 
 
 class CcmdData(Ccmd):
     def __init__(self, args: str):
         super().__init__(CMD_DATA, [args])
-        self.data = self.args[0].encode()
+        self.data = self.args[0]
 
     @classmethod
     def getInstance(cls, data):
@@ -116,8 +116,24 @@ class CcmdData(Ccmd):
     def pad(self):
         size = len(self.data)
         padLen = BLOCKSIZE - size
-        payload = self.name.encode() + self.data
-        payload += (padLen * PAD_BYTE).encode()
+        payload = self.name + self.data
+        payload += (padLen * PAD_BYTE)
+        return payload
+
+    def parse(self):
+        return self.pad()
+
+
+class CcmdStop():
+    def __init__(self):
+        pass
+
+    @classmethod
+    def getInstance(cls):
+        return cls()
+
+    def pad(self):
+        payload = EOF_FLAG + (BLOCKSIZE * PAD_BYTE)
         return payload
 
     def parse(self):
