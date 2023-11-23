@@ -18,8 +18,6 @@ class CSeedCli:
         ports = list(list_ports.comports())
         for port in ports:
             if DAISY_HW_IDENTIFIER in port.hwid:
-                self.__vPrint(
-                    f"Found Daisy Seed ({port.hwid}) on port {port.name}")
                 return port.name
         return None
 
@@ -29,7 +27,6 @@ class CSeedCli:
         ser.write(msg.encode())
         sleep(waitTime)
         stat = ser.readline().decode()
-        self.__vPrint(f"Received {stat} from Seed")
         return stat
 
     def __periodicTransceive(self, msg: str, waitTime: float = 0.02):
@@ -40,16 +37,18 @@ class CSeedCli:
         ser = serial.Serial(self.getDaisyPort())
         while (blockI < blocks):
             self.__vPrint(
-                f"writing {BLOCKSIZE + len(CMD_DATA)} bytes to {ser.port}: Block #{blockI+1}")
+                f"writing {BLOCKSIZE + len(CMD_DATA)} bytes to {ser.port}: Block #{blockI+1}/{blocks}")
             split = msg[blockI*BLOCKSIZE:(blockI+1)*BLOCKSIZE]
             cmdData = commands.CcmdData.getInstance(split)
-            self.__vPrint(cmdData.parse())
-            ser.write(cmdData.parse())
+            self.__vPrint(cmdData.parse().encode())
+            ser.write(cmdData.parse().encode())
             sleep(waitTime)
             stat = ser.readline().decode()
-            self.__vPrint(stat)
-            if stat != CLI_PREFIX + " " + RESPONSE_OK:
+            stat = stat.replace("\n", "").replace("\r", "")
+            if stat != (CLI_PREFIX + " " + RESPONSE_OK):
+                self.__vPrint(f"Early exit error: {stat}")
                 return stat
+            print(stat)
             blockI += 1
         # TODO: CRC
         return CLI_PREFIX + " " + RESPONSE_OK
@@ -61,29 +60,29 @@ class CSeedCli:
             return
         stat = cli.__oneShotTransceive(cmd.parse())
         self.__vPrint(stat)
-        if stat == CLI_PREFIX + " " + RESPONSE_OK:
+        if stat.startswith(CLI_PREFIX + " " + RESPONSE_OK):
             return
         if stat.startswith(CLI_PREFIX + " " + RESPONSE_ERR):
-            print(f"Error: Seed returned <{stat}>")
+            print(f"Error: Seed returned {stat}")
             return
         with open(cmd.targetFile, "r") as f:
             data = f.read()
         stat = self.__periodicTransceive(data)
         self.__vPrint(stat)
-        if stat != CLI_PREFIX + " " + RESPONSE_OK:
+        if not stat.startswith(CLI_PREFIX + " " + RESPONSE_OK):
             print(f"Error: A block transfer failed")
             return
-        cmdData = commands.CcmdData.getInstance(EOF_FLAG)
-        stat = self.__oneShotTransceive(cmdData.parse())
+        cmdStop = commands.CcmdStop.getInstance()
+        stat = self.__oneShotTransceive(cmdStop.parse())
         self.__vPrint(stat)
-        if stat != CLI_PREFIX + " " + RESPONSE_FNSH:
+        if not stat.startswith(CLI_PREFIX + " " + RESPONSE_FNSH):
             print("Seed did not terminate connection with properly!")
             return
 
 
 if __name__ == "__main__":
-    from unittest import mock
-    onTerminal = "seedcli send ./tests/data_small.txt --sdram"
-    with mock.patch('sys.argv', onTerminal.split(" ")):
-        cli = CSeedCli(verbose=True)
-        cli.run()
+    # from unittest import mock
+    # onTerminal = "seedcli send ./seedcli/tests/data_big.txt --sdram"
+    # with mock.patch('sys.argv', onTerminal.split(" ")):
+    cli = CSeedCli(verbose=True)
+    cli.run()
