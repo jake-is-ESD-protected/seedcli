@@ -1,14 +1,14 @@
 import sys
 import os
 from common import *
-
+from typing import List
 
 class Ccmd:
-    def __init__(self, name: str, args: list[str]):
+    def __init__(self, name: str, args: List[str]):
         self.name = name
         self.args = args
 
-    def stripFlags(self, args: list[str]) -> list[str]:
+    def stripFlags(self, args: List[str]) -> List[str]:
         if not isinstance(args, list):
             args = [args]
         flags = [arg for arg in args if arg.startswith(FLAGPREFIX)]
@@ -16,7 +16,7 @@ class Ccmd:
         return args, flags
 
     @staticmethod
-    def sanitizeFlags(flags: list[str], knownFlags: list[str]):
+    def sanitizeFlags(flags: List[str], knownFlags: List[str]):
         for flag in flags:
             if flag not in knownFlags:
                 print(f"Unsupported flag <{flag}>.")
@@ -42,7 +42,7 @@ class Ccmd:
 
 
 class CcmdGet(Ccmd):
-    def __init__(self, args: list[str], flags: list[str]):
+    def __init__(self, args: List[str], flags: List[str]):
         self.flags = flags
         super().__init__(CMD_GET, args)
 
@@ -58,7 +58,7 @@ class CcmdGet(Ccmd):
 
 
 class CcmdSet(Ccmd):
-    def __init__(self, args: list[str], flags: list[str]):
+    def __init__(self, args: List[str], flags: List[str]):
         self.flags = flags
         super().__init__(CMD_SET, args)
 
@@ -78,7 +78,7 @@ class CcmdSet(Ccmd):
 
 
 class CcmdSend(Ccmd):
-    def __init__(self, args: list[str], flags: list[str]):
+    def __init__(self, args: List[str], flags: List[str]):
         self.flags = flags
         self.targetFile = args[0]  # only one file at a time supported
         super().__init__(CMD_SEND, args)
