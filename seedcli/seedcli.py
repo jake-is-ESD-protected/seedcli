@@ -3,6 +3,7 @@ from serial.tools import list_ports
 from time import sleep
 import commands
 from common import *
+import numpy as np
 
 
 class CSeedCli:
@@ -31,7 +32,7 @@ class CSeedCli:
     def __periodicTransceive(self, msg: str, waitTime: float = 0.02):
         fileSize = len(msg)
         blockI = 0
-        blocks = (fileSize / BLOCKSIZE).__ceil__()
+        blocks = np.ceil(fileSize / BLOCKSIZE)
         ser = serial.Serial(self.getDaisyPort())
         crcData = bytes()
         while (blockI < blocks):
