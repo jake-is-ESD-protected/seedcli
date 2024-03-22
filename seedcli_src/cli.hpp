@@ -83,4 +83,6 @@ uint8_t cliErrHandler(void *err, uint32_t len, void *args);
 /// @param len Length of incoming data.
 void cliServer(uint8_t *buf, uint32_t *len);
 
+void formatFloat(float value, int decimal_places, char *out_str);
+
 extern DaisySeed hw;
