@@ -1,6 +1,7 @@
 #include "cli.hpp"
 #include "hal.hpp"
 #include "mem.hpp"
+#include "transientDSP.hpp"
 #include "ui.hpp"
 
 static uint8_t rxBuf[CLI_RX_BUF_SIZE] = {0};
@@ -42,8 +43,6 @@ void cliPrintStr(const char *type, const char *str)
     cliPrintBuf((uint8_t *)txBuf, strlen(txBuf));
 }
 
-char buffer6516[40] = {0};
-
 uint8_t cliParse(void *cmd, uint32_t len, void *args)
 {
     char *msg = (char *)cmd;
@@ -51,15 +50,34 @@ uint8_t cliParse(void *cmd, uint32_t len, void *args)
 
     if (!strcmp(mainCmd, CMD_GET))
     {
-        // SUBCASE
         char *sub_cmd = strtok(NULL, " ");
-        if (!strcmp(sub_cmd, "A1"))
+        if (!strcmp(sub_cmd, "af"))
         {
-            float val = KnobAttack.getValue();
-            formatFloat(val, 3, buffer6516);
-            // ftoa(buffer6516, val, NULL);
-            // buffer6516[6] = '\0';
-            cliPrintStr(RESPONSE_OK, buffer6516);
+            char *id_cmd = strtok(NULL, " ");
+
+            if (id_cmd == NULL)
+            {
+                cliPrintStr(RESPONSE_ERR, "ID missing");
+            }
+
+            char buff[200] = {0};
+            char b_knob_attack[8] = {0};
+            char b_knob_sustain[8] = {0};
+            char b_tau1[16] = {0};
+            char b_tau2[16] = {0};
+            char b_tau3[16] = {0};
+            char b_tau4[16] = {0};
+
+            formatFloat((float)KnobAttack.getValue(), 4, b_knob_attack);
+            formatFloat((float)KnobSustain.getValue(), 4, b_knob_sustain);
+
+            formatFloat((float)attackSlowF.get_attack(), 4, b_tau1);
+            formatFloat((float)attackSlowF.get_release(), 4, b_tau2);
+            formatFloat((float)sustainSlowF.get_release(), 4, b_tau3);
+            formatFloat((float)sustainFastF.get_release(), 4, b_tau4);
+
+            sprintf(buff, "%s, %s, %s, %s, %s, %s, %s", id_cmd, b_knob_attack, b_knob_sustain, b_tau1, b_tau2, b_tau3, b_tau4);
+            cliPrintStr(RESPONSE_OK, buff);
         }
         else
         {
