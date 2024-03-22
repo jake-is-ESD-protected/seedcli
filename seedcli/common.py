@@ -7,6 +7,7 @@ CMD_SET = "set"
 CMD_SEND = "send"
 CMD_DATA = "data"
 
+CMD_PORT_SPECIFIED_FLAG = "--p"
 CMD_SEND_FLAG_SDRAM = "--sdram"
 CMD_SEND_FLAG_QSPI = "--qspi"
 

@@ -48,7 +48,7 @@ class CcmdGet(Ccmd):
 
     @classmethod
     def getInstance(cls, args, flags):
-        knownFlags = []
+        knownFlags = [CMD_PORT_SPECIFIED_FLAG]
         flags = cls.sanitizeFlags(flags, knownFlags)
         return cls(args, flags)
 
@@ -68,7 +68,7 @@ class CcmdSet(Ccmd):
             print(
                 f"<{CMD_SET}> takes exactly two argument names: seedcli {CMD_SET} <target> <value>")
             return None
-        knownFlags = []
+        knownFlags = [CMD_PORT_SPECIFIED_FLAG]
         flags = cls.sanitizeFlags(flags, knownFlags)
         return cls(args, flags)
 
@@ -88,7 +88,7 @@ class CcmdSend(Ccmd):
         if not os.path.exists(args[0]):
             print(f"File <{args[0]}> does not exist!")
             return None
-        knownFlags = [CMD_SEND_FLAG_SDRAM, CMD_SEND_FLAG_QSPI]
+        knownFlags = [CMD_SEND_FLAG_SDRAM, CMD_SEND_FLAG_QSPI, CMD_PORT_SPECIFIED_FLAG]
         flags = cls.sanitizeFlags(flags, knownFlags)
         if flags == []:
             flags = [CMD_SEND_FLAG_SDRAM]

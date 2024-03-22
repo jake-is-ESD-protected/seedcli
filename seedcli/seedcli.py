@@ -9,21 +9,31 @@ import numpy as np
 class CSeedCli:
     def __init__(self, baudrate=115200, verbose=False) -> None:
         self.verbose = verbose
+        self.given_port = None
 
     def __vPrint(self, printable):
         if self.verbose:
             print(printable)
 
     def getDaisyPort(self):
+        if self.given_port:
+            self.__vPrint(f"Using port {self.given_port}")
+            return self.given_port
         ports = list(list_ports.comports())
         for port in ports:
             if DAISY_HW_IDENTIFIER in port.hwid:
+                self.__vPrint(f"Using port {port.name}")
                 return port.name
         return None
 
     def __oneShotTransceive(self, msg: str, waitTime: float = 0.02) -> str:
         self.__vPrint(f"Sending raw string '{msg}'")
-        ser = serial.Serial(self.getDaisyPort())
+        port = self.getDaisyPort()
+        if not port:
+            print("Could not find Daisy Seed!")
+            return None
+        ser = serial.Serial(port)
+        print(ser.port)
         ser.write(msg.encode())
         sleep(waitTime)
         stat = ser.readline().decode()
@@ -74,6 +84,12 @@ class CSeedCli:
         if not cmd:
             print(f"Error: Uknown command or argument.")
             return
+        if CMD_PORT_SPECIFIED_FLAG in cmd.flags:
+            idx = cmd.flags.index(CMD_PORT_SPECIFIED_FLAG) + 1
+            cmd.flags.remove(CMD_PORT_SPECIFIED_FLAG)
+            port = cmd.args[idx]
+            cmd.args.remove(port)
+            self.given_port = port
         stat = cli.__oneShotTransceive(cmd.parse())
         self.__vPrint(stat)
 
@@ -106,7 +122,7 @@ class CSeedCli:
 
 if __name__ == "__main__":
     # from unittest import mock
-    # onTerminal = "seedcli send ./seedcli/tests/data_big.txt --sdram"
+    # onTerminal = "seedcli get x --p COM1"
     # with mock.patch('sys.argv', onTerminal.split(" ")):
-    cli = CSeedCli(verbose=False)
+    cli = CSeedCli(verbose=True)
     cli.run()
