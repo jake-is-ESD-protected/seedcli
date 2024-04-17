@@ -161,3 +161,6 @@ cython_debug/
 
 # vscode stuff
 .vscode
+
+# CSV from data aggregation
+afReturnCSV/

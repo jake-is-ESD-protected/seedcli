@@ -162,6 +162,13 @@ void cliServer(uint8_t *buf, uint32_t *len)
         cliPrintStr(RESPONSE_FNSH, txBuf);
         state = CLI_STATE_idle;
     }
+    if (stat == CLI_STAT_OK)
+    {
+        for (int i = 0; i < CLI_RX_BUF_SIZE; i++)
+        {
+            rxBuf[i] = 0;
+        }
+    }
     // TODO: catch mem overflow and default err
 }
 

@@ -4,6 +4,7 @@ from time import sleep
 import commands
 from common import *
 import numpy as np
+import os
 
 
 class CSeedCli:
@@ -26,6 +27,8 @@ class CSeedCli:
                 return port.name
         return None
 
+
+
     def __oneShotTransceive(self, msg: str, waitTime: float = 0.02) -> str:
         self.__vPrint(f"Sending raw string '{msg}'")
         port = self.getDaisyPort()
@@ -37,6 +40,21 @@ class CSeedCli:
         ser.write(msg.encode())
         sleep(waitTime)
         stat = ser.readline().decode()
+
+        if(msg.startswith("get af")):
+            returnedId = stat[12:].split(",")[0]
+
+            directory = "afReturnCSV"
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+
+            filename = os.path.join(directory, returnedId + ".csv")
+
+            with open(filename, "w") as file:
+                file.write( ','.join(map(str, stat.split(",")[1:])) )
+
+            self.__vPrint("Printed data into: " + returnedId + ".csv")
+
         return stat
 
     def __periodicTransceive(self, msg: str, waitTime: float = 0.02):
