@@ -4,6 +4,7 @@ FLAGPREFIX = "--"
 
 CMD_GET = "get"
 CMD_SET = "set"
+CMD_RESET = "reset"
 CMD_SEND = "send"
 CMD_DATA = "data"
 

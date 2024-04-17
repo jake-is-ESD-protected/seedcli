@@ -85,6 +85,12 @@ uint8_t cliParse(void *cmd, uint32_t len, void *args)
         }
         state = CLI_STATE_idle;
     }
+    else if (!strcmp(mainCmd, CMD_RESET))
+    {
+        resetShiftLayer();
+        cliPrintStr(RESPONSE_OK, "Shift layer has been reset.");
+        state = CLI_STATE_idle;
+    }
     else if (!strcmp(mainCmd, CMD_SET))
     {
         cliPrintStr(RESPONSE_ERR, "Setter not yet implemented.");

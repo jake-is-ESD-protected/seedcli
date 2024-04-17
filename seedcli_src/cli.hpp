@@ -17,6 +17,7 @@ using namespace daisy;
 
 #define CMD_GET "get"
 #define CMD_SET "set"
+#define CMD_RESET "reset"
 #define CMD_SEND "send"
 #define CMD_DATA "data"
 

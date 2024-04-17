@@ -25,7 +25,7 @@ class Ccmd:
 
     @classmethod
     def fromTerminal(cls):  # this is a factory
-        if len(sys.argv) < 3:  # argv[0] is "seedcli", argv[1] is "name"
+        if len(sys.argv) < 2:  # argv[0] is "seedcli", argv[1] is "name"
             print(f"Expected a name, argument or flag")
             return None
         name = sys.argv[1]
@@ -35,6 +35,8 @@ class Ccmd:
             return CcmdGet.getInstance(args, flags)
         elif name == CMD_SET:
             return CcmdSet.getInstance(args, flags)
+        elif name == CMD_RESET:
+            return CcmdReset.getInstance(args, flags)
         elif name == CMD_SEND:
             return CcmdSend.getInstance(args, flags)
         else:
@@ -67,6 +69,25 @@ class CcmdSet(Ccmd):
         if len(args) != 2:
             print(
                 f"<{CMD_SET}> takes exactly two argument names: seedcli {CMD_SET} <target> <value>")
+            return None
+        knownFlags = [CMD_PORT_SPECIFIED_FLAG]
+        flags = cls.sanitizeFlags(flags, knownFlags)
+        return cls(args, flags)
+
+    def parse(self):
+        cmdStr = self.name + " " + " ".join(self.args)
+        return cmdStr
+    
+class CcmdReset(Ccmd):
+    def __init__(self, args: List[str], flags: List[str]):
+        self.flags = flags
+        super().__init__(CMD_RESET, args)
+
+    @classmethod
+    def getInstance(cls, args, flags):
+        if len(args) != 0:
+            print(
+                f"<{CMD_RESET}> takes no arguments")
             return None
         knownFlags = [CMD_PORT_SPECIFIED_FLAG]
         flags = cls.sanitizeFlags(flags, knownFlags)
