@@ -60,6 +60,13 @@ uint8_t cliParse(void *cmd, uint32_t len, void *args)
                 cliPrintStr(RESPONSE_ERR, "ID missing");
             }
 
+            char *song_id_cmd = strtok(NULL, " ");
+
+            if (song_id_cmd == NULL)
+            {
+                cliPrintStr(RESPONSE_ERR, "Song ID missing");
+            }
+
             char buff[200] = {0};
             char b_knob_attack[8] = {0};
             char b_knob_sustain[8] = {0};
@@ -76,7 +83,7 @@ uint8_t cliParse(void *cmd, uint32_t len, void *args)
             formatFloat((float)sustainSlowF.get_release(), 4, b_tau3);
             formatFloat((float)sustainFastF.get_release(), 4, b_tau4);
 
-            sprintf(buff, "%s, %s, %s, %s, %s, %s, %s", id_cmd, b_knob_attack, b_knob_sustain, b_tau1, b_tau2, b_tau3, b_tau4);
+            sprintf(buff, "%s, %s, %s, %s, %s, %s, %s, %s", id_cmd, song_id_cmd, b_knob_attack, b_knob_sustain, b_tau1, b_tau2, b_tau3, b_tau4);
             cliPrintStr(RESPONSE_OK, buff);
         }
         else

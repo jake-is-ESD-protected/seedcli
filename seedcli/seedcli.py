@@ -42,18 +42,15 @@ class CSeedCli:
         stat = ser.readline().decode()
 
         if(msg.startswith("get af")):
-            returnedId = stat[12:].split(",")[0]
+            measurmentId = stat[12:].split(",")[0]
+            songId = stat[12:].split(",")[1].lstrip()
 
-            directory = "afReturnCSV"
-            if not os.path.exists(directory):
-                os.makedirs(directory)
+            with open("AITD_Dataset.csv", "a+") as file:
+                s = ','.join(map(str, stat.split(":")[2:]))
+                s = s.lstrip()
+                file.write(s)
 
-            filename = os.path.join(directory, returnedId + ".csv")
-
-            with open(filename, "w") as file:
-                file.write( ','.join(map(str, stat.split(",")[1:])) )
-
-            self.__vPrint("Printed data into: " + returnedId + ".csv")
+            self.__vPrint("MeasurmentId: " + measurmentId + " SongId: " + songId)
 
         return stat
 
