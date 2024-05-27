@@ -3,7 +3,7 @@
 #include "hal.hpp"
 
 static char DSY_SDRAM_BSS sdramBuf[SDRAM_BUF_SIZE];
-char DSY_QSPI_BSS qspiBuf[QSPI_BUF_SIZE];
+// char DSY_QSPI_BSS qspiBuf[QSPI_BUF_SIZE]; //THIS IS COMMENTED OUT CUS CURRENTLY PROG FLASHER IS ACTIVE
 
 uint8_t memSdramWrite(void *buf, uint32_t len, void *args)
 {
@@ -33,10 +33,10 @@ uint8_t memQspiWrite(void *buf, uint32_t len, void *args)
     uint8_t stat = memSdramWrite(buf, len, args);
     if (stat == MEM_FINISH)
     {
-        size_t startAddr = (size_t)qspiBuf;
+        /* size_t startAddr = (size_t)qspiBuf;
         __memEraseQspiFlash((uint8_t *)qspiBuf, (i * BLOCKSIZE_DATA));
         __memWriteQspiFlash(startAddr, (i * BLOCKSIZE_DATA), (uint8_t *)sdramBuf);
-        i = 0;
+        i = 0;*/ //THIS IS COMMENTED OUT CUS CURRENTLY PROG FLASHER IS ACTIVE
     }
     i++;
     return stat;
