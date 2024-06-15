@@ -3,6 +3,7 @@
 #include "mem.hpp"
 #include "transientDSP.hpp"
 #include "ui.hpp"
+#include "ai.h"
 
 static uint8_t rxBuf[CLI_RX_BUF_SIZE] = {0};
 static cli_state_t state = CLI_STATE_idle;
@@ -84,6 +85,15 @@ uint8_t cliParse(void *cmd, uint32_t len, void *args)
             formatFloat((float)sustainFastF.get_release(), 4, b_tau4);
 
             sprintf(buff, "%s, %s, %s, %s, %s, %s, %s, %s", id_cmd, song_id_cmd, b_knob_attack, b_knob_sustain, b_tau1, b_tau2, b_tau3, b_tau4);
+            cliPrintStr(RESPONSE_OK, buff);
+        }
+        else if(!strcmp(sub_cmd, "ai")){
+            char buff[64] = {0};
+            char b_tau1[16] = {0};
+            char b_tau2[16] = {0};
+            formatFloat(aiGetATTACK_T1(), 4, b_tau1);
+            formatFloat(aiGetSUSTAIN_T1(), 4, b_tau2);
+            sprintf(buff, "%s, %s", b_tau1, b_tau2);
             cliPrintStr(RESPONSE_OK, buff);
         }
         else
