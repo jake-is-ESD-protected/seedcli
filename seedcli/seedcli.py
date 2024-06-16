@@ -5,6 +5,7 @@ import commands
 from common import *
 import numpy as np
 import os
+import math
 
 
 class CSeedCli:
@@ -94,6 +95,66 @@ class CSeedCli:
             return
         print(f"{'█' * int(100/(max-min))}", end="", flush=True)
 
+    def drawPotis(self, t1, t2):
+        radius = 10
+        diameter = 2 * radius
+        min_value = 0
+        max_value = 1
+        space_between_gauges = 30
+
+        def normalize_value(value):
+            return (value - min_value) / (max_value - min_value)
+
+        def map_angle(normalized_value):
+            return 240 - normalized_value * 300
+
+        def create_gauge_array():
+            return [[' ' for _ in range(diameter * 4 + space_between_gauges + 2)] for _ in range(diameter + 1)]
+
+        def draw_circle(gauge, offset):
+            for y in range(diameter + 1):
+                for x in range(diameter * 2 + 1):
+                    dx = (x - radius * 2) / 2  # Adjust the x-coordinate for aspect ratio
+                    dy = y - radius
+                    distance = math.sqrt(dx * dx + dy * dy)
+                    theta = math.atan2(dy, dx)
+                    theta_degrees = math.degrees(theta)
+                    if theta_degrees < 0:
+                        theta_degrees += 360
+                    theta_degrees = (theta_degrees + 180) % 360  # Adjust for terminal coordinate
+                    if abs(distance - radius) < 1:  # Adjust thickness of the circle line
+                        if theta_degrees <= 240 or theta_degrees >= 300:
+                            gauge[y][x + offset] = '#'
+
+        def draw_needle(gauge, angle, offset):
+            cx, cy = radius * 2, radius
+            for r in range(radius):
+                nx = int(cx + r * math.cos(angle) * 2) + offset  # Adjust for aspect ratio
+                ny = int(cy - r * math.sin(angle))
+                if 0 <= nx < diameter * 4 + space_between_gauges + 2 and 0 <= ny < diameter + 1:
+                    gauge[ny][nx] = '*'
+
+        # Create a 2D array to represent both gauges
+        gauge = create_gauge_array()
+
+        # First gauge
+        normalized_value1 = normalize_value(t1)
+        angle_degrees1 = map_angle(normalized_value1)
+        angle1 = math.radians(angle_degrees1)
+        draw_circle(gauge, 0)
+        draw_needle(gauge, angle1, 0)
+
+        # Second gauge
+        normalized_value2 = normalize_value(t2)
+        angle_degrees2 = map_angle(normalized_value2)
+        angle2 = math.radians(angle_degrees2)
+        draw_circle(gauge, diameter * 2 + space_between_gauges + 1)
+        draw_needle(gauge, angle2, diameter * 2 + space_between_gauges + 1)
+
+        # Print the gauges
+        for row in gauge:
+            print(''.join(row))
+
     def run(self):
         cmd = commands.Ccmd.fromTerminal()
         if not cmd:
@@ -109,6 +170,11 @@ class CSeedCli:
         self.__vPrint(stat)
 
         if RESPONSE_OK in stat:
+            if "ai" in cmd.args:    # AI-TD CLI AI output visualizer for demo
+                temp = stat.split()
+                t1 = temp[-2][:-1]
+                t2 = temp[-1]
+                self.drawPotis(float(t1), float(t2))
             return
         if RESPONSE_ERR in stat:
             print(f"Error: Seed returned {stat}")
