@@ -4,6 +4,7 @@
 #include "transientDSP.hpp"
 #include "ui.hpp"
 #include "ai.h"
+#include "af.h"
 
 static uint8_t rxBuf[CLI_RX_BUF_SIZE] = {0};
 static cli_state_t state = CLI_STATE_idle;
@@ -94,6 +95,11 @@ uint8_t cliParse(void *cmd, uint32_t len, void *args)
             formatFloat(aiGetATTACK_T1(), 4, b_tau1);
             formatFloat(aiGetSUSTAIN_T1(), 4, b_tau2);
             sprintf(buff, "%s, %s", b_tau1, b_tau2);
+            cliPrintStr(RESPONSE_OK, buff);
+        }
+        else if (!strcmp(sub_cmd, "time")){
+            char buff[64] = {0};
+            sprintf(buff, "af: %d ms, ai: %d ms", (int)afGetTimeAF(), (int)aiGetTimeInf());
             cliPrintStr(RESPONSE_OK, buff);
         }
         else

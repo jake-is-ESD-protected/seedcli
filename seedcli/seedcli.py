@@ -175,6 +175,8 @@ class CSeedCli:
                 t1 = temp[-2][:-1]
                 t2 = temp[-1]
                 self.drawPotis(float(t1), float(t2))
+            if "time" in cmd.args:
+                print(cmd.args)
             return
         if RESPONSE_ERR in stat:
             print(f"Error: Seed returned {stat}")
